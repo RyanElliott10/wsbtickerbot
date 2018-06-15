@@ -57,8 +57,8 @@ def main(mode, sr, num_submissions):
 	subreddit = setup.subreddit(sr)
 	new_wsb = subreddit.new(limit=num_submissions)
 
-	print("Progress:")
-	sys.stdout.flush()
+	if (mode):
+		print("Progress:")
 
 	for count, submission in enumerate(new_wsb):
 		if (not mode and "Daily Discussion Thread - " not in submission.title):
@@ -92,7 +92,7 @@ def main(mode, sr, num_submissions):
 
 				if (not mode):		# if it is in bot mode
 					reply = "To help you YOLO your money away, here are all of the tickers mentioned"
-					reply += "(and links to their Yahoo Finance page):"
+					reply += " that have been formatted as $TICK (and links to their Yahoo Finance page):"
 
 					for key, value in total_dict.items():
 						if (key == "ROPE"):
@@ -132,8 +132,8 @@ if (__name__ == "__main__"):
 	# USAGE: wsbtickerbot.py [ subreddit ] [ num_submissions ]
 
 	mode = 0
-	num_submissions = 100
-	sr = ""
+	num_submissions = 500
+	sr = "wallstreetbets"
 
 	if (len(sys.argv) > 1):
 		mode = 1
