@@ -108,7 +108,7 @@ def setup(sub):
 
 	# create a reddit instance
 	reddit = praw.Reddit(client_id="your_id", client_secret="your_secret",
-								username="wsbtickerbot", password="Re08.31!99", user_agent="wsbtickerbot")
+								username="your_username", password="your_password", user_agent="wsbtickerbot")
 	# create an instance of the subreddit
 	subreddit = reddit.subreddit(sub)
 	return subreddit
