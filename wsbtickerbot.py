@@ -107,8 +107,8 @@ def setup(sub):
 		sub = "wallstreetbets"
 
 	# create a reddit instance
-	reddit = praw.Reddit(client_id="9uqRzVXVDVTm-Q", client_secret="JItr3NUU7tRXxA8B2pRqvCJrYmU",
-								username="your_username", password="your_password", user_agent="wsbtickerbot")
+	reddit = praw.Reddit(client_id="your_id", client_secret="your_secret",
+								username="wsbtickerbot", password="Re08.31!99", user_agent="wsbtickerbot")
 	# create an instance of the subreddit
 	subreddit = reddit.subreddit(sub)
 	return subreddit
@@ -180,7 +180,6 @@ def main(mode, sub, num_submissions):
 
 if (__name__ == "__main__"):
 	# USAGE: wsbtickerbot.py [ subreddit ] [ num_submissions ]
-
 	mode = 0
 	num_submissions = 250
 	sub = "wallstreetbets"
