@@ -14,7 +14,9 @@ sys.path.insert(0, 'vaderSentiment/vaderSentiment')
 from vaderSentiment import SentimentIntensityAnalyzer
 
 def extract_ticker(body, start_index):
-   """ Given a starting index and text, this will extract the ticker, return None if it is incorrectly formatted """
+   """
+   Given a starting index and text, this will extract the ticker, return None if it is incorrectly formatted.
+   """
    count  = 0
    ticker = ""
 
@@ -97,9 +99,9 @@ def get_url(key, value, total_count):
    mention = ("mentions", "mention") [value == 1]
    # special case for $ROPE
    if key == "ROPE":
-      return "${0}: [{1} {2} ({3}% of all mentions)](https://www.homedepot.com/b/Hardware-Chains-Ropes-Rope/N-5yc1vZc2gr)".format(key, value, mention, int(value / total_count * 100))
+      return "${0} | [{1} {2} ({3}% of all mentions)](https://www.homedepot.com/b/Hardware-Chains-Ropes-Rope/N-5yc1vZc2gr)".format(key, value, mention, int(value / total_count * 100))
    else:
-      return "${0}: [{1} {2} ({3}% of all mentions)](https://finance.yahoo.com/quote/{0}?p={0})".format(key, value, mention, int(value / total_count * 100))
+      return "${0} | [{1} {2} ({3}% of all mentions)](https://finance.yahoo.com/quote/{0}?p={0})".format(key, value, mention, int(value / total_count * 100))
 
 def final_post(subreddit, text):
    # finding the daily discussino thread to post
@@ -172,7 +174,8 @@ def main(mode, sub, num_submissions):
          sys.stdout.write("\rProgress: {0} / {1} posts".format(count + 1, num_submissions))
          sys.stdout.flush()
 
-   text = "To help you YOLO your money away, here are all of the tickers mentioned at least 10 times in all the posts within the past 24 hours (and links to their Yahoo Finance page):"
+   text = "To help you YOLO your money away, here are all of the tickers mentioned at least 10 times in all the posts within the past 24 hours (and links to their Yahoo Finance page) along with a sentiment analysis percentage:"
+   text += "\n\nTicker | Mentions | Bullish Sentiment | Neutral Sentiment | Bearish Sentiment\n:- | :- | :- | :- | :-"
 
    total_mentions = 0
    ticker_list = []
@@ -192,7 +195,7 @@ def main(mode, sub, num_submissions):
          break
       
       url = get_url(ticker.ticker, ticker.count, total_mentions)
-      text += "\n\n{} Bullish: {}%\tBearish: {}%\tNeutral: {}%".format(url, ticker.bullish, ticker.bearish, ticker.neutral)
+      text += "\n{} | {}% | {}% | {}%".format(url, ticker.bullish, ticker.bearish, ticker.neutral)
 
    # post to the subreddit if it is in bot mode (i.e. not testing)
    if not mode:
@@ -229,7 +232,6 @@ class Ticker:
       self.bullish = int(self.pos_count / len(self.bodies) * 100)
       self.bearish = int(self.neg_count / len(self.bodies) * 100)
       self.neutral = int(neutral_count / len(self.bodies) * 100)
-      # print("{}:\tBullish: {}%\tBearish: {}%\tNeutral: {}%".format(self.ticker, self.bullish, self.bearish, self.neutral))
 
 if __name__ == "__main__":
    # USAGE: wsbtickerbot.py [ subreddit ] [ num_submissions ]
