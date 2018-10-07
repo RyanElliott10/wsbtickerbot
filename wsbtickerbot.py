@@ -34,17 +34,19 @@ def extract_ticker(body, start_index):
 
 def parse_section(ticker_dict, body):
    """ Parses the body of each comment/reply """
-   blacklist_words = ["YOLO", "TOS", "CEO", "CFO", "CTO", "DD", "BTFD", "WSB", "OK", "RH",
-                      "KYS", "FD", "TYS", "US", "USA", "IT", "ATH", "RIP", "BMW", "GDP",
-                      "OTM", "ATM", "ITM", "IMO", "LOL", "DOJ", "BE", "PR", "PC", "ICE",
-                      "TYS", "ISIS", "PRAY", "PT", "FBI", "SEC", "GOD", "NOT", "POS", "COD",
-                      "AYYMD", "FOMO", "TL;DR", "EDIT", "STILL", "LGMA", "WTF", "RAW", "PM",
-                      "LMAO", "LMFAO", "ROFL", "EZ", "RED", "BEZOS", "TICK", "IS", "DOW"
-                      "AM", "PM", "LPT", "GOAT", "FL", "CA", "IL", "PDFUA", "MACD", "HQ",
-                      "OP", "DJIA", "PS", "AH", "TL", "DR", "JAN", "FEB", "JUL", "AUG",
-                      "SEP", "SEPT", "OCT", "NOV", "DEC", "FDA", "IV", "ER", "IPO", "RISE"
-                      "IPA", "URL", "MILF", "BUT", "SSN", "FIFA", "USD", "CPU", "AT",
-                      "GG", "ELON"]
+   blacklist_words = [
+      "YOLO", "TOS", "CEO", "CFO", "CTO", "DD", "BTFD", "WSB", "OK", "RH",
+      "KYS", "FD", "TYS", "US", "USA", "IT", "ATH", "RIP", "BMW", "GDP",
+      "OTM", "ATM", "ITM", "IMO", "LOL", "DOJ", "BE", "PR", "PC", "ICE",
+      "TYS", "ISIS", "PRAY", "PT", "FBI", "SEC", "GOD", "NOT", "POS", "COD",
+      "AYYMD", "FOMO", "TL;DR", "EDIT", "STILL", "LGMA", "WTF", "RAW", "PM",
+      "LMAO", "LMFAO", "ROFL", "EZ", "RED", "BEZOS", "TICK", "IS", "DOW"
+      "AM", "PM", "LPT", "GOAT", "FL", "CA", "IL", "PDFUA", "MACD", "HQ",
+      "OP", "DJIA", "PS", "AH", "TL", "DR", "JAN", "FEB", "JUL", "AUG",
+      "SEP", "SEPT", "OCT", "NOV", "DEC", "FDA", "IV", "ER", "IPO", "RISE"
+      "IPA", "URL", "MILF", "BUT", "SSN", "FIFA", "USD", "CPU", "AT",
+      "GG", "ELON"
+   ]
 
    if '$' in body:
       index = body.find('$') + 1
@@ -181,13 +183,16 @@ def main(mode, sub, num_submissions):
 
    ticker_list = sorted(ticker_list, key=operator.attrgetter("count"), reverse=True)
 
+   for ticker in ticker_list:
+      Ticker.analyze_sentiment(ticker)
+
    # will break as soon as it hits a ticker with fewer than 5 mentions
    for count, ticker in enumerate(ticker_list):
       if count == 25:
          break
       
       url = get_url(ticker.ticker, ticker.count, total_mentions)
-      text += "\n\n" + url
+      text += "\n\n{} Bullish: {}%\tBearish: {}%\tNeutral: {}%".format(url, ticker.bullish, ticker.bearish, ticker.neutral)
 
    # post to the subreddit if it is in bot mode (i.e. not testing)
    if not mode:
@@ -195,18 +200,36 @@ def main(mode, sub, num_submissions):
    # testing
    else:
       print("\nNot posting to reddit because you're in test mode")
-      # print(text)
+      print(text)
 
 class Ticker:
    def __init__(self, ticker):
       self.ticker = ticker
       self.count = 0
       self.bodies = []
+      self.pos_count = 0
+      self.neg_count = 0
+      self.bullish = 0
+      self.bearish = 0
+      self.neutral = 0
       self.sentiment = 0 # 0 is neutral
 
-# def analyze_sentiment(self, ticker_dict):
-#    for body in bodies:
-#       analyzer = SentimentIntensityAnalyzer()
+   def analyze_sentiment(self):
+      analyzer = SentimentIntensityAnalyzer()
+      neutral_count = 0
+      for text in self.bodies:
+         sentiment = analyzer.polarity_scores(text)
+         if (sentiment["compound"] > .005) or (sentiment["pos"] > abs(sentiment["neg"])):
+            self.pos_count += 1
+         elif (sentiment["compound"] < -.005) or (abs(sentiment["neg"]) > sentiment["pos"]):
+            self.neg_count += 1
+         else:
+            neutral_count += 1
+
+      self.bullish = int(self.pos_count / len(self.bodies) * 100)
+      self.bearish = int(self.neg_count / len(self.bodies) * 100)
+      self.neutral = int(neutral_count / len(self.bodies) * 100)
+      # print("{}:\tBullish: {}%\tBearish: {}%\tNeutral: {}%".format(self.ticker, self.bullish, self.bearish, self.neutral))
 
 if __name__ == "__main__":
    # USAGE: wsbtickerbot.py [ subreddit ] [ num_submissions ]
