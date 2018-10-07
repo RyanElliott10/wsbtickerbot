@@ -175,7 +175,7 @@ def main(mode, sub, num_submissions):
          sys.stdout.flush()
 
    text = "To help you YOLO your money away, here are all of the tickers mentioned at least 10 times in all the posts within the past 24 hours (and links to their Yahoo Finance page) along with a sentiment analysis percentage:"
-   text += "\n\nTicker | Mentions | Bullish Sentiment | Neutral Sentiment | Bearish Sentiment\n:- | :- | :- | :- | :-"
+   text += "\n\nTicker | Mentions | Bullish | Neutral | Bearish\n:- | :- | :- | :- | :-"
 
    total_mentions = 0
    ticker_list = []
