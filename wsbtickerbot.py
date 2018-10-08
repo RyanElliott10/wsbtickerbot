@@ -57,7 +57,7 @@ def parse_section(ticker_dict, body):
       if word and word not in blacklist_words:
          try:
             # special case for $ROPE
-            if word is not "ROPE":
+            if word != "ROPE":
                price = IEXStock(word).get_price()
                if word in ticker_dict:
                   ticker_dict[word].count += 1
@@ -78,7 +78,7 @@ def parse_section(ticker_dict, body):
          # if it isn't, it'll return an error and therefore continue on to the next word
          try:
             # special case for $ROPE
-            if word is not "ROPE":
+            if word != "ROPE":
                price = IEXStock(word).get_price()
          except:
             continue
@@ -113,7 +113,7 @@ def final_post(subreddit, text):
 
 def get_date():
    now = datetime.datetime.now()
-   return now.strftime("%d-%m-%Y")
+   return now.strftime("%b %d, %Y")
 
 def setup(sub):
    if sub == "":
@@ -131,7 +131,7 @@ def setup(sub):
    return subreddit
 
 
-def main(mode, sub, num_submissions):
+def run(mode, sub, num_submissions):
    ticker_dict = {}
    text = ""
    total_count = 0
@@ -195,14 +195,17 @@ def main(mode, sub, num_submissions):
          break
       
       url = get_url(ticker.ticker, ticker.count, total_mentions)
+      # setting up formatting for table
       text += "\n{} | {}% | {}% | {}%".format(url, ticker.bullish, ticker.bearish, ticker.neutral)
+
+   text += "\n\nTake a look at my [source code](https://github.com/RyanElliott10/wsbtickerbot) and make some contributions if you're interested."
 
    # post to the subreddit if it is in bot mode (i.e. not testing)
    if not mode:
       final_post(subreddit, text)
    # testing
    else:
-      print("\nNot posting to reddit because you're in test mode")
+      print("\nNot posting to reddit because you're in test mode\n\n*************************************************\n")
       print(text)
 
 class Ticker:
@@ -243,4 +246,4 @@ if __name__ == "__main__":
       mode = 1
       num_submissions = int(sys.argv[2])
 
-   main(mode, sub, num_submissions)
+   run(mode, sub, num_submissions)
