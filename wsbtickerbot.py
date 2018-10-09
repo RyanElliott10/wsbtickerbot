@@ -97,11 +97,15 @@ def parse_section(ticker_dict, body):
 def get_url(key, value, total_count):
    # determine whether to use plural or singular
    mention = ("mentions", "mention") [value == 1]
+   if int(value / total_count * 100) == 0:
+         perc_mentions = "<1"
+   else:
+         perc_mentions = int(value / total_count * 100)
    # special case for $ROPE
    if key == "ROPE":
-      return "${0} | [{1} {2} ({3}% of all mentions)](https://www.homedepot.com/b/Hardware-Chains-Ropes-Rope/N-5yc1vZc2gr)".format(key, value, mention, int(value / total_count * 100))
+      return "${0} | [{1} {2} ({3}% of all mentions)](https://www.homedepot.com/b/Hardware-Chains-Ropes-Rope/N-5yc1vZc2gr)".format(key, value, mention, perc_mentions)
    else:
-      return "${0} | [{1} {2} ({3}% of all mentions)](https://finance.yahoo.com/quote/{0}?p={0})".format(key, value, mention, int(value / total_count * 100))
+      return "${0} | [{1} {2} ({3}% of all mentions)](https://finance.yahoo.com/quote/{0}?p={0})".format(key, value, mention, perc_mentions)
 
 def final_post(subreddit, text):
    # finding the daily discussino thread to post
